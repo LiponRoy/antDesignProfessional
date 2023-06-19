@@ -2,6 +2,10 @@
   text-align: center;
 }
 
+.ant-menu{
+  /* background-color: brown !important; */
+}
+
 .nav-container{
   height: 70px;
   width: 100%;

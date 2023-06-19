@@ -1,12 +1,12 @@
-import logo from './logo.svg';
 import './App.css';
-import Home from './pages/Home';
+import DeshBoardLayout from './components/deshboard/DeshBoardLayout';
+
 
 
 function App() {
 	return (
 		<>
-		<Home></Home>
+		<DeshBoardLayout></DeshBoardLayout>
 		</>
 	);
 }
