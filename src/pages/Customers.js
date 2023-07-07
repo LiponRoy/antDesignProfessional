@@ -1,18 +1,25 @@
 import { Button, Modal, Table, Form, Input, Select, Checkbox } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { useAddDataMutation, useGetDataQuery } from '../feature/dataApi';
+import { useAddDataMutation, useDeleteDataMutation, useGetDataQuery, useUpdateDataMutation } from '../feature/dataApi';
+import { useParams } from 'react-router-dom';
 
 const Customers = () => {
+	const { id } = useParams();
 	// Get Data Form RTK Query
 	const { data: allData, isFetching } = useGetDataQuery();
 	const [addData, { isLoading: addLoading, isSuccess }] = useAddDataMutation();
+	const [updateData, { isLoading: updateLoading, updateSuccess }] = useUpdateDataMutation();
+	const [deleteData] = useDeleteDataMutation();
+	
 
 
 	// store all data here
 	// const [allData, setAllData] = useState([]);
 	// Add Edit Modal Visibility useState
 	const [addEditModalVisibality, seAddEditModalVisibality] = useState(false);
+	// for edit item
+	const [editItem, setEditItem] = useState(null);
 
 	// columns for table
 	const [columnsAl, setColumnsAll] = useState([
@@ -40,12 +47,15 @@ const Customers = () => {
 			dataIndex: 'isActive',
 		},
 		{
-			// title: 'Functions',
-			// dataIndex: 'Functions',
+			title: 'Actions',
+			dataIndex: '_id',
 			render: (id, record) => (
 				<div className=' flex justify-center items-center gap-x-2'>
-					<DeleteOutlined className=' mx-2 text-lg cursor-pointer' />
-					<EditOutlined className=' mx-2 text-lg cursor-pointer' />
+					<EditOutlined className=' mx-2 text-lg cursor-pointer' onClick={() => {
+						setEditItem(record);
+						seAddEditModalVisibality(true);
+					}} />
+					<DeleteOutlined onClick={()=>{deleteData(record._id)}} className=' mx-2 text-lg cursor-pointer' />
 				</div>
 			),
 		},
@@ -63,16 +73,26 @@ const Customers = () => {
 
 	}, [allData]);
 
-	const Finish = (values) => {
-		console.log(values);
-		dataAdd(values)
+	const Finish = async(values) => {
 
+		editItem!==null ? await updateData(values):await addData(values)
 
+		
+		// console.log("ddd :"+editItem)
+		ModalCancel();
 	};
 
-	const dataAdd = async (val) => {
-		await addData(val)
+	const ModalCancel = () => {
+		setTimeout(() => {
+			setEditItem(null)
+			seAddEditModalVisibality(false)
+		}, 500);
+
 	}
+
+	// const dataAdd = async (val) => {
+	// 	await addData(val)
+	// }
 
 	return (
 		<div>
@@ -84,8 +104,8 @@ const Customers = () => {
 			</div>
 			<Table columns={columnsAl} dataSource={allData && allData}></Table>
 			{/* // Modal for Add Edit from */}
-			<Modal title='Add Modal' open={addEditModalVisibality} onCancel={() => seAddEditModalVisibality(false)} footer={[]}>
-				<Form layout='vertical' onFinish={Finish}>
+			{addEditModalVisibality && <Modal title={`${editItem!==null ?'Edit Item':'Add Item'}`} open={addEditModalVisibality} onCancel={() => ModalCancel()} footer={[]}>
+				<Form layout='vertical' initialValues={editItem} onFinish={Finish}>
 					{/* // name input */}
 					<Form.Item
 						label='Name'
@@ -144,7 +164,7 @@ const Customers = () => {
 						</Button>
 					</div>
 				</Form>
-			</Modal>
+			</Modal>}
 		</div>
 	);
 };

@@ -8,7 +8,7 @@ export const dataApi = createApi({
 	tagTypes: ['dataTag'],
 	endpoints: (builder) => ({
 		getData: builder.query({
-			query: () => 'allUser',
+			query: () => '/allUser',
 			transformResponse: (res) => res.reverse(),
 			providesTags: ['dataTag'],
 		}),
@@ -20,21 +20,21 @@ export const dataApi = createApi({
 			}),
 			invalidatesTags: ['dataTag'],
 		}),
-		// updateData: builder.mutation({
-		// 	query: ({ _id, ...data }) => ({
-		// 		url: `/data/update/${_id}`,
-		// 		method: 'PUT',
-		// 		body: data,
-		// 	}),
-		// 	invalidatesTags: ['dataTag'],
-		// }),
-		// deleteData: builder.mutation({
-		// 	query: (_id) => ({
-		// 		url: `/data/delete/${_id}`,
-		// 		method: 'DELETE',
-		// 	}),
-		// 	invalidatesTags: ['dataTag'],
-		// }),
+		updateData: builder.mutation({
+			query: ({ _id, ...data }) => ({
+				url: `/updateUser/${_id}`,
+				method: 'PUT',
+				body: data,
+			}),
+			invalidatesTags: ['dataTag'],
+		}),
+		deleteData: builder.mutation({
+			query: (_id) => ({
+				url: `/deleteUser/${_id}`,
+				method: 'DELETE',
+			}),
+			invalidatesTags: ['dataTag'],
+		}),
 		// getDataById: builder.query({
 		// 	query: (_id) => `/data/getOne/${_id}`,
 		// 	invalidatesTags: ['dataTag'],
@@ -42,4 +42,4 @@ export const dataApi = createApi({
 	}),
 });
 
-export const { useGetDataQuery,useAddDataMutation} = dataApi;
+export const { useGetDataQuery,useAddDataMutation,useUpdateDataMutation,useDeleteDataMutation} = dataApi;
