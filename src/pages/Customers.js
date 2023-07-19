@@ -2,10 +2,10 @@ import { Button, Modal, Table, Form, Input, Select, Checkbox } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useAddDataMutation, useDeleteDataMutation, useGetDataQuery, useUpdateDataMutation } from '../feature/dataApi';
-import { useParams } from 'react-router-dom';
+import Notiflix from 'notiflix';
 
 const Customers = () => {
-	const { id } = useParams();
+	
 	// Get Data Form RTK Query
 	const { data: allData, isFetching } = useGetDataQuery();
 	const [addData, { isLoading: addLoading, isSuccess }] = useAddDataMutation();
@@ -14,8 +14,6 @@ const Customers = () => {
 	
 
 
-	// store all data here
-	// const [allData, setAllData] = useState([]);
 	// Add Edit Modal Visibility useState
 	const [addEditModalVisibality, seAddEditModalVisibality] = useState(false);
 	// for edit item
@@ -26,6 +24,7 @@ const Customers = () => {
 		{
 			title: 'Name',
 			dataIndex: 'name',
+			
 		},
 		{
 			title: 'Image',
@@ -33,66 +32,91 @@ const Customers = () => {
 			// width: 120,
 			// maxWidth: 120,
 			render: (t, r) => <img src={`${r.image}`} height='80' width='80' />,
+			
+
 		},
 		{
 			title: 'Phone',
 			dataIndex: 'phone',
+			
 		},
 		{
 			title: 'Gender',
 			dataIndex: 'gender',
+			
+
 		},
 		{
 			title: 'isActive',
 			dataIndex: 'isActive',
+			
+
 		},
 		{
 			title: 'Actions',
 			dataIndex: '_id',
-			render: (id, record) => (
+			render: (_,record) => (
 				<div className=' flex justify-center items-center gap-x-2'>
 					<EditOutlined className=' mx-2 text-lg cursor-pointer' onClick={() => {
 						setEditItem(record);
 						seAddEditModalVisibality(true);
 					}} />
-					<DeleteOutlined onClick={()=>{deleteData(record._id)}} className=' mx-2 text-lg cursor-pointer' />
+					<DeleteOutlined onClick={()=>{confirmDelete(record._id,record)}} className=' mx-2 text-lg cursor-pointer' />
 				</div>
 			),
+			
+
 		},
 	]);
 
-	// const dataFetch = () => {
-	// 	fetch('http://localhost:4000/user/allUser')
-	// 		.then((res) => res.json())
-	// 		.then((result) => {
-	// 			setAllData(result);
-	// 		});
-	// };
+	// For Table rowKey unique id
+	let lastIndex = 0
+	const updateIndex = () => {
+		lastIndex++
+		return lastIndex
+	  }
+	// For Table rowKey unique id End
 
-	useEffect(() => {
-
-	}, [allData]);
 
 	const Finish = async(values) => {
 
-		editItem!==null ? await updateData({_id:editItem._id,data:values}):await addData(values)
+		try {
+			editItem!==null ? await updateData({_id:editItem._id,data:values}):await addData(values)
+		} catch (error) {
+			console.log(error)
+		}
 
-		
-		console.log("Finish er moodhe :",editItem)
 		ModalCancel();
 	};
 
 	const ModalCancel = () => {
-		setTimeout(() => {
 			setEditItem(null)
 			seAddEditModalVisibality(false)
-		}, 500);
-
 	}
 
-	// const dataAdd = async (val) => {
-	// 	await addData(val)
-	// }
+	//  for delete confirmation dialog
+		const confirmDelete = (id,record) => {
+			Notiflix.Confirm.show(
+				`Delete "${record.name}"`,
+				`Do you delete ${record.name} ?`,
+				'Delete',
+				'NO',
+				function okCb() {
+					deleteData(id);
+					
+				},
+				function cancelCb() {},
+				{
+					width: '320px',
+					borderRadius: '8px',
+					// etc...
+				},
+			);
+		};
+	//  for delete confirmation dialog  End
+
+
+
 
 	return (
 		<div>
@@ -102,7 +126,7 @@ const Customers = () => {
 					ADD USER
 				</Button>
 			</div>
-			<Table columns={columnsAl} dataSource={allData && allData}></Table>
+			<Table rowKey={()=>updateIndex()}  columns={columnsAl} dataSource={allData && allData}></Table>
 			{/* // Modal for Add Edit from */}
 			{addEditModalVisibality && <Modal title={`${editItem!==null ?'Edit Item':'Add Item'}`} open={addEditModalVisibality} onCancel={() => ModalCancel()} footer={[]}>
 				<Form layout='vertical' initialValues={editItem} onFinish={Finish}>
