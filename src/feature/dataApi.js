@@ -21,7 +21,7 @@ export const dataApi = createApi({
 			invalidatesTags: ['dataTag'],
 		}),
 		updateData: builder.mutation({
-			query: ({ _id, ...data }) => ({
+			query: ({ _id, data }) => ({
 				url: `/updateUser/${_id}`,
 				method: 'PUT',
 				body: data,

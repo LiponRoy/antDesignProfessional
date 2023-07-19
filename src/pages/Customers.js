@@ -75,10 +75,10 @@ const Customers = () => {
 
 	const Finish = async(values) => {
 
-		editItem!==null ? await updateData(values):await addData(values)
+		editItem!==null ? await updateData({_id:editItem._id,data:values}):await addData(values)
 
 		
-		// console.log("ddd :"+editItem)
+		console.log("Finish er moodhe :",editItem)
 		ModalCancel();
 	};
 
